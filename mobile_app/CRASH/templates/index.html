@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crash detection</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global styles */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s;
+        }
+
+        #container {
+            max-width: 800px;
+            margin: 3% auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            transition: transform 0.3s;
+            transform: scale(1);
+        }
+
+        #container:hover {
+            transform: scale(1.03);
+        }
+
+        h1 {
+            color: #333;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0;
+        }
+
+        /* Form styles */
+        form {
+            margin-top: 20px;
+        }
+
+        h2 {
+            font-size: 1.4em;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #007BFF;
+            display: inline-block;
+        }
+
+        input[type="file"] {
+            display: block;
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        input[type="submit"],
+        #startCamera {
+            background: linear-gradient(45deg, #007BFF, #00C6FF);
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        input[type="submit"]:hover,
+        #startCamera:hover {
+            background: linear-gradient(45deg, #00C6FF, #007BFF);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transform: translateY(-3px);
+        }
+
+        /* Camera and Processed Frame styles */
+        #video-container {
+            position: relative;
+            width: 30%;
+            max-width: 100%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid #333;
+        }
+
+        #video {
+            position: absolute;
+            top: 0;
+            right: -35%;
+            width: 30%;
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid #007BFF;
+        }
+
+        #output {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        #canvas {
+            display: none;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid #00C6FF;
+        }
+
+        /* Add hover effects */
+        #video:hover,
+        #canvas:hover,
+        #output:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            border: 2px solid #007BFF;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>Crash Detection</h1>
+        <p><i></i><b>UYIR HACKATHON 2025</b></i></p>
+        <h2>Upload File</h2>
+        <form action="/" method="post" enctype="multipart/form-data">
+            <input type="file" name="file">
+            <input type="submit" value="Upload and Process">
+        </form>
+        <h2>Camera Feed</h2>
+        <button id="startCamera">Start Camera</button>
+        <video id="video" width="640" height="480" autoplay style="display: none;"></video>
+        <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+        <h2>Processed Frame</h2>
+        <img id="output" alt="Processed output">
+    </div>
+    <script>
+        var video = document.getElementById('video');
+        var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var output = document.getElementById('output');
+        var startCameraBtn = document.getElementById('startCamera');
+
+        startCameraBtn.onclick = function() {
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                    video.srcObject = stream;
+                    video.style.display = 'block';
+                    video.play();
+                    setTimeout(processFrame, 5000);
+                });
+            }
+        }
+
+        function processFrame() {
+            context.drawImage(video, 0, 0, 640, 480);
+            canvas.toBlob(function(blob) {
+                var formData = new FormData();
+                formData.append('file', blob);
+
+                fetch('/process_frame', {
+                    method: 'POST',
+                    body: formData
+                }).then(response => response.blob())
+                  .then(images => {
+                      var outside = URL.createObjectURL(images);
+                      output.src = outside;
+                      setTimeout(processFrame, 500);
+                  });
+            }, 'image/jpeg');
+        }
+    </script>
+</body>
+</html>
