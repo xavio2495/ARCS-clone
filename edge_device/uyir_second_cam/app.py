@@ -16,10 +16,10 @@ from openai import AzureOpenAI  # Updated import
 app = Flask(__name__)
 
 # Azure OpenAI configuration
-AZURE_OPENAI_ENDPOINT = "https://afs.openai.azure.com/"
-AZURE_OPENAI_KEY = "a9c9ed4ede724626a6bfddff2c717817"
-OPENAI_MODEL = "gpt-4o-mini"
-API_VERSION = "2024-10-01-preview"
+AZURE_OPENAI_ENDPOINT = ""
+AZURE_OPENAI_KEY = ""
+OPENAI_MODEL = ""
+API_VERSION = ""
 
 # Configure OpenAI API client for Azure - using the new format
 client = AzureOpenAI(
@@ -47,7 +47,7 @@ CAMERA_LOCATION = "Gandhipuram"
 POLICE_STATION = "City Police Station"
 CAMERA_STREAM_URL = "http://172.20.10.8:5003/video_feed"
 
-AZURE_STORAGE_CONNECTION_STRING = "DefaultEndpointsProtocol=https;AccountName=multicam;AccountKey=XhBKwnIqcmwICy/yKi4u0J1AmVbiB3hAzFE34A4WXUFirxuBX+rQiqr1BPKu6wvj1ZvALVNCTbJO+ASt5F7s6Q==;EndpointSuffix=core.windows.net"
+AZURE_STORAGE_CONNECTION_STRING = ""
 CONTAINER_NAME = "threatlevelevidence"
 
 try:
